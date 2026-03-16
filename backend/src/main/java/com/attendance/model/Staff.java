@@ -149,10 +149,14 @@ public class Staff {
     }
 
     public String getSubject() {
-        if (subject != null && !subject.isBlank()) {
-            return subject;
+        if (subjects != null && !subjects.isEmpty()) {
+            java.util.StringJoiner joiner = new java.util.StringJoiner(", ");
+            for (Subject s : subjects) {
+                joiner.add(s.getSubjectName());
+            }
+            return joiner.toString();
         }
-        return subjects != null && !subjects.isEmpty() ? subjects.get(0).getSubjectName() : null;
+        return subject;
     }
 
     public String getEmployeeCode() {

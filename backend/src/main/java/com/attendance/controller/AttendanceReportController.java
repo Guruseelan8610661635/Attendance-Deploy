@@ -147,20 +147,27 @@ public class AttendanceReportController {
      * @param toDate Optional end date filter
      */
     @GetMapping("/student/{rollNumber}")
-    public ResponseEntity<ApiResponse<AttendanceReportDTO>> getStudentReport(
+    @SuppressWarnings("unchecked")
+    public ResponseEntity getStudentReport(
             @PathVariable String rollNumber,
             @RequestParam(required = false) String fromDate,
             @RequestParam(required = false) String toDate) {
-        
-        LocalDate from = fromDate != null ? LocalDate.parse(fromDate) : null;
-        LocalDate to = toDate != null ? LocalDate.parse(toDate) : null;
-        AttendanceReportDTO report = reportService.getStudentReport(rollNumber, from, to);
-        
-        if (report == null) {
-            return ResponseEntity.notFound().build();
+        try {
+            LocalDate from = fromDate != null ? LocalDate.parse(fromDate) : null;
+            LocalDate to = toDate != null ? LocalDate.parse(toDate) : null;
+            AttendanceReportDTO report = reportService.getStudentReport(rollNumber, from, to);
+            
+            if (report == null) {
+                return ResponseEntity.status(404).body(ApiResponse.error("Student not found: " + rollNumber));
+            }
+            
+            return ResponseEntity.ok(ApiResponse.success(report));
+        } catch (Exception e) {
+            String msg = e.getClass().getSimpleName() + ": " + e.getMessage();
+            System.err.println("\uD83D\uDD34 Student report error for '" + rollNumber + "': " + msg);
+            e.printStackTrace();
+            return ResponseEntity.status(500).body(ApiResponse.error("Report error: " + msg));
         }
-        
-        return ResponseEntity.ok(ApiResponse.success(report));
     }
 
 }

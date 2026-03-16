@@ -101,13 +101,12 @@ const TimetableManagement: React.FC = () => {
     { id: 'p3', start: '10:45', end: '11:30' },
     { id: 'p4', start: '11:30', end: '12:00' },
     { id: 'p5', start: '13:00', end: '13:50' },
-    { id: 'p6', start: '14:00', end: '15:00' },
   ]);
 
   const [timetable, setTimetable] = useState<Record<string, string[]>>(() => {
     const initial: Record<string, string[]> = {};
     DAYS.forEach(day => {
-      initial[day] = Array(6).fill('Select Subject');
+      initial[day] = Array(5).fill('Select Subject');
     });
     return initial;
   });
@@ -311,15 +310,74 @@ const TimetableManagement: React.FC = () => {
     }
   };
 
-  // ✨ NEW: Watch for semester changes and load subjects
+  // ✨ NEW: Watch for semester changes and load subjects + existing timetable
   useEffect(() => {
     if (!selectedSemester) {
       setSemesterSubjects([]);
       return;
     }
     const semesterNum = parseInt(selectedSemester.split(' ')[1]);
-    fetchSemesterSubjects(semesterNum);
-  }, [selectedSemester, selectedDepartment]);
+    
+    const loadData = async () => {
+      // 1. Fetch subjects first
+      await fetchSemesterSubjects(semesterNum);
+
+      // 2. Then fetch existing timetable
+      if (!isStaff) {
+        try {
+          setSaving(true);
+          const response = await apiClient.get('/admin/timetable');
+          const allSessions = response.data.data || [];
+          console.log('🔍 Loaded all timetable sessions from DB:', allSessions);
+          
+          // Filter for this specific class using structured fields
+          const classSessions = allSessions.filter((s: any) => 
+            s.department === selectedDepartment && 
+            s.semester === semesterNum && 
+            (s.section === 'A' || !s.section)
+          );
+          console.log(`🔍 Filtered sessions for ${selectedDepartment} Sem ${semesterNum}:`, classSessions);
+
+          const newTimetable: Record<string, string[]> = {};
+          DAYS.forEach(day => {
+            newTimetable[day] = Array(periods.length).fill('Select Subject');
+          });
+
+          if (classSessions.length > 0) {
+            // Sort: sessions WITH subjects first, nulls last — so valid subjects always win
+            const sorted = [...classSessions].sort((a: any, b: any) => {
+              const aHas = !!(a.subjectName || a.subjectCode);
+              const bHas = !!(b.subjectName || b.subjectCode);
+              return (bHas ? 1 : 0) - (aHas ? 1 : 0);
+            });
+
+            sorted.forEach((session: any) => {
+              const dayIndex = DAYS.indexOf(session.dayOfWeek);
+              if (dayIndex !== -1) {
+                const periodIndex = session.sessionNumber ? session.sessionNumber - 1 : -1;
+                const subjectValue = session.subjectName || session.subjectCode;
+                
+                if (periodIndex >= 0 && periodIndex < periods.length && subjectValue) {
+                  // Only overwrite with a real subject (never overwrite a good value with undefined)
+                  if (newTimetable[DAYS[dayIndex]][periodIndex] === 'Select Subject') {
+                    newTimetable[DAYS[dayIndex]][periodIndex] = subjectValue;
+                  }
+                }
+              }
+            });
+          }
+          console.log('📅 Final constructed Timetable Layout:', newTimetable);
+          setTimetable(newTimetable);
+        } catch (error) {
+          console.error('Error fetching existing timetable:', error);
+        } finally {
+          setSaving(false);
+        }
+      }
+    };
+    
+    loadData();
+  }, [selectedSemester, selectedDepartment, periods.length]);
 
   // Subject CRUD Handlers
   const handleCreateSubject = async () => {
@@ -445,21 +503,22 @@ const TimetableManagement: React.FC = () => {
         const subjectCode = subjectObj?.subjectCode || null;
 
         const sessionData = {
-          day: day,
+          dayOfWeek: day,
           periodNumber: periodIndex + 1,
+          sessionNumber: periodIndex + 1,
           startTime: period.start + ':00',
           endTime: period.end + ':00',
           department: selectedDepartment,
           semester: semesterNum,
           section: 'A',
-          subjectCode: subjectCode,
-          staffCode: null,   // Will need staff selection in future
+          subjectId: subjectCode,
+          facultyId: null,   // Will need staff selection in future
           roomNumber: null
         };
 
         console.log('💾 Auto-saving session to database:', sessionData);
         
-        const response = await apiClient.post('/admin/timetable/session', sessionData);
+        const response = await apiClient.post('/admin/timetable', sessionData);
         console.log('✅ Session auto-saved:', response.data);
         
       } catch (error) {
@@ -494,19 +553,20 @@ const TimetableManagement: React.FC = () => {
             const subjectCode = subjectObj?.subjectCode || null;
             
             const sessionData = {
-              day: day,
+              dayOfWeek: day, // mapped field name
               periodNumber: periodIndex + 1,
+              sessionNumber: periodIndex + 1, // required by backend
               startTime: period.start + ':00',
               endTime: period.end + ':00',
               department: selectedDepartment,
               semester: semesterNum,
               section: 'A',
-              subjectCode: subjectCode,
-              staffCode: null,
+              subjectId: subjectCode,
+              facultyId: null,
               roomNumber: `R${periodIndex + 1}01`
             };
             
-            sessionPromises.push(apiClient.post('/admin/timetable/session', sessionData));
+            sessionPromises.push(apiClient.post('/admin/timetable', sessionData));
           }
         });
       });
@@ -525,14 +585,13 @@ const TimetableManagement: React.FC = () => {
   };
 
   const resetTimetable = () => {
-    if (confirm('Revert to default institutional 6-period structure?')) {
+    if (confirm('Revert to default institutional 5-period structure?')) {
       setPeriods([
         { id: 'p1', start: '09:00', end: '09:45' },
         { id: 'p2', start: '09:45', end: '10:30' },
         { id: 'p3', start: '10:45', end: '11:30' },
         { id: 'p4', start: '11:30', end: '12:00' },
         { id: 'p5', start: '13:00', end: '13:50' },
-        { id: 'p6', start: '14:00', end: '15:00' },
       ]);
     }
   };
@@ -565,14 +624,14 @@ const TimetableManagement: React.FC = () => {
                 onClick={resetTimetable}
                 className="px-8 py-5 bg-slate-50 border border-slate-200 rounded-3xl font-black text-[10px] uppercase tracking-widest text-slate-400 hover:text-rose-500 hover:border-rose-100 transition-all flex items-center gap-3"
               >
-                <RotateCcw className="w-4 h-4" /> Reset Layout
+                <RotateCcw className="w-4 h-4" /> Reset Timetable
               </button>
               <button 
                 onClick={handleSave}
                 disabled={saving}
                 className="px-12 py-5 bg-indigo-600 text-white rounded-3xl font-black text-[10px] uppercase tracking-widest shadow-2xl shadow-indigo-600/20 active:scale-95 transition-all flex items-center gap-3 disabled:opacity-50"
               >
-                <Save className="w-4 h-4" /> {saving ? 'Synchronizing...' : 'Commit Changes'}
+                <Save className="w-4 h-4" /> {saving ? 'Saving Timetable...' : 'Save Timetable'}
               </button>
             </>
           )}

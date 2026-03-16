@@ -4,6 +4,9 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
+import java.util.List;
+import java.util.ArrayList;
+
 /**
  * DTO for Staff Registration
  * Handles creation of both User and Staff records atomically
@@ -27,7 +30,7 @@ public class StaffRegistrationDTO {
     @Size(min = 6, message = "Password must be at least 6 characters")
     private String password;
     
-    private String subject;
+    private List<String> subjects = new ArrayList<>();
     private String phone;
     private String qualification;
     private Integer experience;
@@ -87,12 +90,12 @@ public class StaffRegistrationDTO {
         this.password = password;
     }
     
-    public String getSubject() {
-        return subject;
+    public List<String> getSubjects() {
+        return subjects;
     }
     
-    public void setSubject(String subject) {
-        this.subject = subject;
+    public void setSubjects(List<String> subjects) {
+        this.subjects = subjects;
     }
     
     public String getPhone() {

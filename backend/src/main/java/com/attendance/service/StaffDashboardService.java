@@ -94,12 +94,16 @@ public class StaffDashboardService {
                     String section = firstSession.getSection();
                     String year = "Year " + ((semester + 1) / 2);
 
-                    // Derive subject from the sessions mapped to this group (use distinct to cover multiple subjects)
+                    // Derive subjects from the sessions mapped to this group
                     String subjectName = entry.getValue().stream()
                             .map(TimetableSession::getSubjectName)
                             .filter(Objects::nonNull)
-                            .findFirst()
-                            .orElse(staff.getSubject());
+                            .distinct()
+                            .collect(Collectors.joining(", "));
+                            
+                    if (subjectName.isEmpty()) {
+                        subjectName = staff.getSubject();
+                    }
                     
                     // Get student count for this department and semester
                     Long studentCount = studentRepository.countByDepartmentAndSemester(department, semester);

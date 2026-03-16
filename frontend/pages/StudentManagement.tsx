@@ -90,12 +90,12 @@ const StudentManagement: React.FC<StudentManagementProps> = ({ userRole }) => {
       }
     };
 
-    if (!isStudent) {
+    if (isAdmin) {
       fetchStaff();
     } else {
       setStaffLoading(false);
     }
-  }, [isStudent]);
+  }, [isAdmin]);
 
   // Filter Logic - Scoped by Department and Year if present
   const filteredStudents = useMemo(() => {
@@ -569,7 +569,7 @@ const StudentManagement: React.FC<StudentManagementProps> = ({ userRole }) => {
                       </div>
                     )}
                     <div className="space-y-3"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Department</label><input required name="department" defaultValue={editingItem?.department || (deptContext ? deptContext : 'Computer Science')} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-5 font-bold text-slate-900 outline-none focus:ring-4 focus:ring-indigo-100" /></div>
-                    <div className="space-y-3"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Subject</label><input name="subject" defaultValue={editingItem?.subject || ''} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-5 font-bold text-slate-900 outline-none focus:ring-4 focus:ring-indigo-100" /></div>
+                    <div className="space-y-3"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Subjects</label><input name="subject" defaultValue={editingItem?.subject || ''} placeholder="e.g. Physics, Chemistry (Comma Separated)" className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-5 font-bold text-slate-900 outline-none focus:ring-4 focus:ring-indigo-100" /></div>
                     <div className="space-y-3"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Phone</label><input type="tel" name="phone" defaultValue={editingItem?.phone || ''} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-5 font-bold text-slate-900 outline-none focus:ring-4 focus:ring-indigo-100" /></div>
                     <div className="space-y-3"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Qualification</label><input name="qualification" defaultValue={editingItem?.qualification || ''} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-5 font-bold text-slate-900 outline-none focus:ring-4 focus:ring-indigo-100" /></div>
                     <div className="space-y-3"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Experience (Years)</label><input type="number" name="experience" defaultValue={editingItem?.experience || '0'} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-5 font-bold text-slate-900 outline-none focus:ring-4 focus:ring-indigo-100" /></div>

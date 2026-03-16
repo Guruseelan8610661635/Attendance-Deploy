@@ -81,31 +81,38 @@ public class StaffController {
             staff.setStaffCode(dto.getStaffCode());
             staff.setName(dto.getName());
             staff.setDepartment(dto.getDepartment());
-            staff.setSubject(dto.getSubject());
+            // Collect subjects list and set comma separated legacy string
+            if (dto.getSubjects() != null && !dto.getSubjects().isEmpty()) {
+                String combinedSubjects = String.join(", ", dto.getSubjects());
+                staff.setSubject(combinedSubjects.length() > 100 ? combinedSubjects.substring(0, 97) + "..." : combinedSubjects);
+            }
+            
             staff.setPhone(dto.getPhone());
             staff.setQualification(dto.getQualification());
             staff.setExperience(dto.getExperience());
             staff.setUser(savedUser);
             staff.setActive(true);
             
-            // AUTO-POPULATE staff_subjects table if subject is provided
-            if (dto.getSubject() != null && !dto.getSubject().isBlank()) {
-                Subject subject = subjectRepo.findBySubjectName(dto.getSubject())
-                    .orElseGet(() -> {
-                        // Create new subject if it doesn't exist
-                        Subject newSubject = new Subject();
-                        newSubject.setSubjectName(dto.getSubject());
-                        newSubject.setSubjectCode(generateSubjectCode(dto.getSubject()));
-                        newSubject.setDepartment(dto.getDepartment());
-                        newSubject.setSemester(1); // Default semester
-                        newSubject.setCredits(4); // Default credits
-                        return subjectRepo.save(newSubject);
-                    });
-                
-                // Link staff to subject (populates staff_subjects table)
-                List<Subject> subjects = new ArrayList<>();
-                subjects.add(subject);
-                staff.setSubjects(subjects);
+            // AUTO-POPULATE staff_subjects table for all provided subjects
+            if (dto.getSubjects() != null && !dto.getSubjects().isEmpty()) {
+                List<Subject> subjectsList = new ArrayList<>();
+                for (String subjName : dto.getSubjects()) {
+                    if (subjName == null || subjName.isBlank()) continue;
+                    String sanitizedName = subjName.trim();
+                    Subject subject = subjectRepo.findBySubjectName(sanitizedName)
+                        .orElseGet(() -> {
+                            // Create new subject if it doesn't exist
+                            Subject newSubject = new Subject();
+                            newSubject.setSubjectName(sanitizedName);
+                            newSubject.setSubjectCode(generateSubjectCode(sanitizedName));
+                            newSubject.setDepartment(dto.getDepartment());
+                            newSubject.setSemester(1); // Default semester
+                            newSubject.setCredits(4); // Default credits
+                            return subjectRepo.save(newSubject);
+                        });
+                    subjectsList.add(subject);
+                }
+                staff.setSubjects(subjectsList);
             }
             
             Staff savedStaff = staffRepo.save(staff);
@@ -248,22 +255,25 @@ public class StaffController {
                     
                     // AUTO-UPDATE staff_subjects table if subject changed
                     if (staffUpdates.getSubject() != null && !staffUpdates.getSubject().isBlank()) {
-                        Subject subject = subjectRepo.findBySubjectName(staffUpdates.getSubject())
-                            .orElseGet(() -> {
-                                // Create new subject if it doesn't exist
-                                Subject newSubject = new Subject();
-                                newSubject.setSubjectName(staffUpdates.getSubject());
-                                newSubject.setSubjectCode(generateSubjectCode(staffUpdates.getSubject()));
-                                newSubject.setDepartment(staffUpdates.getDepartment());
-                                newSubject.setSemester(1); // Default semester
-                                newSubject.setCredits(4); // Default credits
-                                return subjectRepo.save(newSubject);
-                            });
-                        
-                        // Update staff-subject relationship
-                        List<Subject> subjects = new ArrayList<>();
-                        subjects.add(subject);
-                        staff.setSubjects(subjects);
+                        String[] subjArray = staffUpdates.getSubject().split(",");
+                        List<Subject> subjectsList = new ArrayList<>();
+                        for (String subjStr : subjArray) {
+                            String subjectName = subjStr.trim();
+                            if (subjectName.isEmpty()) continue;
+                            Subject subject = subjectRepo.findBySubjectName(subjectName)
+                                .orElseGet(() -> {
+                                    // Create new subject if it doesn't exist
+                                    Subject newSubject = new Subject();
+                                    newSubject.setSubjectName(subjectName);
+                                    newSubject.setSubjectCode(generateSubjectCode(subjectName));
+                                    newSubject.setDepartment(staffUpdates.getDepartment());
+                                    newSubject.setSemester(1); // Default semester
+                                    newSubject.setCredits(4); // Default credits
+                                    return subjectRepo.save(newSubject);
+                                });
+                            subjectsList.add(subject);
+                        }
+                        staff.setSubjects(subjectsList);
                     }
                     
                     Staff updated = staffRepo.save(staff);

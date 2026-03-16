@@ -12,6 +12,10 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
     Optional<Student> findByUserId(Long userId);
     
     Optional<Student> findByRollNo(String rollNo);
+
+    // Find student by their linked User account username (for student login -> report flow)
+    @Query("SELECT s FROM Student s WHERE s.user.username = :username")
+    Optional<Student> findByUserUsername(@Param("username") String username);
     
     @Query("SELECT s.department, COUNT(DISTINCT s.id) " +
            "FROM Student s WHERE s.active = true GROUP BY s.department")

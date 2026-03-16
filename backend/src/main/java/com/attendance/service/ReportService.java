@@ -5,6 +5,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.attendance.dto.AttendanceReportDTO;
 import com.attendance.model.SessionAttendance;
@@ -14,6 +15,7 @@ import com.attendance.repository.SessionAttendanceRepository;
 import com.attendance.repository.StudentRepository;
 
 @Service
+@Transactional(readOnly = true)
 public class ReportService {
 
     private final SessionAttendanceRepository attendanceRepository;
@@ -161,12 +163,15 @@ public class ReportService {
         List<AttendanceReportDTO> reports = new ArrayList<>();
         
         for (Student student : students) {
+            // Skip students without proper profile data
+            if (student.getName() == null || student.getName().isBlank()) continue;
+            
             List<SessionAttendance> attendances = attendanceRepository.findByStudentId(student.getId());
             
             long total = attendances.size();
             long present = attendances.stream()
                 .filter(a -> a.getStatus() == AttendanceStatus.PRESENT || 
-                           a.getStatus() == AttendanceStatus.OD)
+                               a.getStatus() == AttendanceStatus.OD)
                 .count();
             
             double percentage = total > 0 ? (present * 100.0 / total) : 0.0;
@@ -174,7 +179,7 @@ public class ReportService {
             reports.add(new AttendanceReportDTO(
                 student.getId(),
                 student.getName(),
-                student.getRollNo(),
+                student.getRollNo() != null ? student.getRollNo() : student.getRollNumber(),
                 student.getDepartment(),
                 student.getSemester(),
                 student.getSection(),
@@ -188,38 +193,45 @@ public class ReportService {
     }
 
     /**
-     * Generate attendance report for a specific student by roll number
+     * Generate attendance report for a specific student by roll number OR username
      */
     public AttendanceReportDTO getStudentReport(String rollNumber, LocalDate fromDate, LocalDate toDate) {
+        // Try lookup by rollNo first (e.g. "CS001"), then fall back to login username
         Optional<Student> studentOpt = studentRepository.findByRollNo(rollNumber);
+        if (studentOpt.isEmpty()) {
+            studentOpt = studentRepository.findByUserUsername(rollNumber);
+        }
         
         if (studentOpt.isEmpty()) {
             return null;
         }
         
         Student student = studentOpt.get();
-        List<SessionAttendance> attendances;
+        
+        long total;
+        long present;
         
         if (fromDate != null && toDate != null) {
-            attendances = attendanceRepository.findByDateBetween(fromDate, toDate).stream()
-                .filter(a -> a.getStudent().getId().equals(student.getId()))
-                .collect(Collectors.toList());
+            // Use filtered counts for date-range queries
+            total = attendanceRepository.findByDateBetween(fromDate, toDate).stream()
+                .filter(a -> a.getStudent() != null && a.getStudent().getId().equals(student.getId()))
+                .count();
+            present = attendanceRepository.findByDateBetween(fromDate, toDate).stream()
+                .filter(a -> a.getStudent() != null && a.getStudent().getId().equals(student.getId()))
+                .filter(a -> a.getStatus() == AttendanceStatus.PRESENT || a.getStatus() == AttendanceStatus.OD)
+                .count();
         } else {
-            attendances = attendanceRepository.findByStudentId(student.getId());
+            // Use direct DB count queries — avoids loading the full entity graph
+            total = attendanceRepository.countTotalByStudentId(student.getId());
+            present = attendanceRepository.countPresentByStudentId(student.getId());
         }
-        
-        long total = attendances.size();
-        long present = attendances.stream()
-            .filter(a -> a.getStatus() == AttendanceStatus.PRESENT || 
-                       a.getStatus() == AttendanceStatus.OD)
-            .count();
         
         double percentage = total > 0 ? (present * 100.0 / total) : 0.0;
         
         return new AttendanceReportDTO(
             student.getId(),
-            student.getName(),
-            student.getRollNo(),
+            student.getName() != null ? student.getName() : "Student",
+            student.getRollNo() != null ? student.getRollNo() : rollNumber,
             student.getDepartment(),
             student.getSemester(),
             student.getSection(),

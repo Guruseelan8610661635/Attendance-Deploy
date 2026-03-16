@@ -1,0 +1,105 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ---------------------< com.attendance:attendance >----------------------
+[INFO] Building attendance-backend 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] >>> spring-boot:4.0.1:run (default-cli) > test-compile @ attendance >>>
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ attendance ---
+[INFO] Copying 2 resources from src\main\resources to target\classes
+[INFO] Copying 2 resources from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.14.1:compile (default-compile) @ attendance ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ attendance ---
+[INFO] skip non existing resourceDirectory C:\Users\donys\Attendance\Attendance-Deploy\backend\src\test\resources
+[INFO] 
+[INFO] --- compiler:3.14.1:testCompile (default-testCompile) @ attendance ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] <<< spring-boot:4.0.1:run (default-cli) < test-compile @ attendance <<<
+[INFO] 
+[INFO] 
+[INFO] --- spring-boot:4.0.1:run (default-cli) @ attendance ---
+[INFO] Attaching agents: []
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.0.1)
+
+2026-03-16T21:00:59.778+05:30  INFO 19212 --- [           main] c.a.AttendanceBackendApplication         : Starting AttendanceBackendApplication using Java 17.0.12 with PID 19212 (C:\Users\donys\Attendance\Attendance-Deploy\backend\target\classes started by donys in C:\Users\donys\Attendance\Attendance-Deploy\backend)
+2026-03-16T21:00:59.783+05:30 DEBUG 19212 --- [           main] c.a.AttendanceBackendApplication         : Running with Spring Boot v4.0.1, Spring v7.0.2
+2026-03-16T21:00:59.783+05:30  INFO 19212 --- [           main] c.a.AttendanceBackendApplication         : No active profile set, falling back to 1 default profile: "default"
+2026-03-16T21:01:00.707+05:30  INFO 19212 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-03-16T21:01:00.788+05:30  INFO 19212 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 72 ms. Found 9 JPA repository interfaces.
+2026-03-16T21:01:01.530+05:30  INFO 19212 --- [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8080 (http)
+2026-03-16T21:01:01.546+05:30  INFO 19212 --- [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-03-16T21:01:01.547+05:30  INFO 19212 --- [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.15]
+2026-03-16T21:01:01.608+05:30  INFO 19212 --- [           main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 1757 ms
+2026-03-16T21:01:01.629+05:30  INFO 19212 --- [           main] com.attendance.security.JwtUtil          : JWT secret validation passed. Secret length: 69 characters
+2026-03-16T21:01:01.679+05:30  INFO 19212 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-03-16T21:01:01.858+05:30  INFO 19212 --- [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@340cb97f
+2026-03-16T21:01:01.859+05:30  INFO 19212 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-03-16T21:01:01.939+05:30  INFO 19212 --- [           main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-03-16T21:01:02.007+05:30  INFO 19212 --- [           main] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.2.0.Final
+2026-03-16T21:01:02.591+05:30  INFO 19212 --- [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-03-16T21:01:02.688+05:30  WARN 19212 --- [           main] org.hibernate.orm.deprecation            : HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-03-16T21:01:02.703+05:30  INFO 19212 --- [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:mysql://localhost:3306/attendance_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC]
+	Database driver: MySQL Connector/J
+	Database dialect: MySQLDialect
+	Database version: 8.0.41
+	Default catalog/schema: attendance_db/undefined
+	Autocommit mode: undefined/unknown
+	Isolation level: REPEATABLE_READ [default REPEATABLE_READ]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-03-16T21:01:03.847+05:30  INFO 19212 --- [           main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-03-16T21:01:03.968+05:30  INFO 19212 --- [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-03-16T21:01:04.027+05:30  INFO 19212 --- [           main] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-03-16T21:01:05.582+05:30  INFO 19212 --- [           main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name customUserDetailsService
+2026-03-16T21:01:05.719+05:30  WARN 19212 --- [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-03-16T21:01:06.184+05:30  WARN 19212 --- [           main] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.context.ApplicationContextException: Failed to start bean 'webServerStartStop'
+2026-03-16T21:01:06.187+05:30  INFO 19212 --- [           main] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-03-16T21:01:06.189+05:30  INFO 19212 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-03-16T21:01:06.197+05:30  INFO 19212 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-03-16T21:01:06.206+05:30  INFO 19212 --- [           main] .s.b.a.l.ConditionEvaluationReportLogger : 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2026-03-16T21:01:06.216+05:30 ERROR 19212 --- [           main] o.s.b.d.LoggingFailureAnalysisReporter   : 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Web server failed to start. Port 8080 was already in use.
+
+Action:
+
+Identify and stop the process that's listening on port 8080 or configure this application to listen on another port.
+
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  10.371 s
+[INFO] Finished at: 2026-03-16T21:01:06+05:30
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.springframework.boot:spring-boot-maven-plugin:4.0.1:run (default-cli) on project attendance: Process terminated with exit code: 1 -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException

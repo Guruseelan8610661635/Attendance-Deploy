@@ -14,6 +14,12 @@ import com.attendance.model.Staff;
 public interface TimetableSessionRepository
         extends JpaRepository<TimetableSession, Long> {
 
+    // 🔹 Fetch ALL sessions with subject + staff eagerly loaded
+    @Query("SELECT ts FROM TimetableSession ts " +
+           "LEFT JOIN FETCH ts.subject " +
+           "LEFT JOIN FETCH ts.staff")
+    List<TimetableSession> findAllWithDetails();
+
     // 🔹 Pending attendance sessions for a given date
     @Query("""
         SELECT t FROM TimetableSession t
@@ -31,6 +37,9 @@ public interface TimetableSessionRepository
     
     List<TimetableSession> findByDepartmentAndSemesterAndDayOfWeekAndActiveTrue(
             String department, int semester, String dayOfWeek);
+            
+    java.util.List<com.attendance.model.TimetableSession> findByDepartmentAndSemesterAndSectionAndDayOfWeekAndSessionNumber(
+            String department, int semester, String section, String dayOfWeek, Integer sessionNumber);
     
     // Case-insensitive day of week query
     @Query("SELECT ts FROM TimetableSession ts WHERE ts.department = :department " +
@@ -87,4 +96,8 @@ public interface TimetableSessionRepository
     
     List<TimetableSession> findByDepartmentAndSemesterAndSectionAndActiveTrue(
             String department, int semester, String section);
+
+    @org.springframework.data.jpa.repository.Modifying
+    @Query("UPDATE TimetableSession t SET t.staff = null WHERE t.staff.id = :staffId")
+    void removeStaffFromAllSessions(@Param("staffId") Long staffId);
 }
