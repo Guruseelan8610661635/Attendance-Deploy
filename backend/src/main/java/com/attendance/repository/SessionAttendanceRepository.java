@@ -15,6 +15,14 @@ public interface SessionAttendanceRepository extends JpaRepository<SessionAttend
 
 	List<SessionAttendance> findByStudentId(Long studentId);
 
+    /** Count all attendance records for a student (avoids lazy-load entity graph issues) */
+    @Query("SELECT COUNT(sa) FROM SessionAttendance sa WHERE sa.student.id = :studentId")
+    long countTotalByStudentId(@Param("studentId") Long studentId);
+
+    /** Count PRESENT + OD attendance records for a student */
+    @Query("SELECT COUNT(sa) FROM SessionAttendance sa WHERE sa.student.id = :studentId AND (sa.status = com.attendance.model.AttendanceStatus.PRESENT OR sa.status = com.attendance.model.AttendanceStatus.OD)")
+    long countPresentByStudentId(@Param("studentId") Long studentId);
+
 	List<SessionAttendance> findByTimetableSessionId(Long sessionId);
 
 	List<SessionAttendance> findByTimetableSessionSubjectId(Long subjectId);
