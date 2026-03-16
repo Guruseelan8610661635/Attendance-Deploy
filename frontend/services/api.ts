@@ -1,7 +1,11 @@
 import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'axios';
 
 // Use relative path for dev (proxied to Render), full URL for production
-const API_BASE_URL = import.meta.env.DEV ? '/api' : (import.meta.env.VITE_API_BASE_URL as string);
+let envUrl = (import.meta.env.VITE_API_BASE_URL as string) || '';
+if (envUrl && envUrl.endsWith('/')) envUrl = envUrl.slice(0, -1);
+if (envUrl && !envUrl.endsWith('/api')) envUrl += '/api';
+
+const API_BASE_URL = import.meta.env.DEV ? '/api' : envUrl;
 
 /**
  * Axios instance configured for the attendance management API
