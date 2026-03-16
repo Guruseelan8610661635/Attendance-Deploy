@@ -1,7 +1,0 @@
-{
-  "name": "AttendX - Advanced Student Attendance System",
-  "description": "A comprehensive, enterprise-grade student attendance management system featuring real-time data visualization, predictive analytics, and multi-role access control.",
-  "requestFramePermissions": [
-    "camera"
-  ]
-}

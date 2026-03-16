@@ -3,7 +3,9 @@
 # =====================================
 
 $Host.UI.RawUI.WindowTitle = "AttendX Backend - Local Development (Port 8080)"
-Set-Location "c:\Users\donys\Downloads\Attendance-Deploy\backend"
+
+# Ensure we run from the repo's backend folder regardless of where the repo is located on disk
+Set-Location "$PSScriptRoot\..\backend"
 
 Write-Host ""
 Write-Host "========================================" -ForegroundColor Cyan

@@ -1,5 +1,7 @@
 $Host.UI.RawUI.WindowTitle = "AttendX Backend - Port 8080"
-Set-Location "C:\Users\donys\Downloads\Attendance-Deploy\backend"
+
+# Ensure we run from the repo's backend folder regardless of where the repo is located on disk
+Set-Location "$PSScriptRoot\..\backend"
 
 # Environment Variables
 $env:JWT_SECRET = "oo7fBm3airbvtz0WxhopUTnhu7nr4ZhYqbq4HkMLaBhLCuXuQg6f3WPwfVOEjm9liWAeAv6dejDzUijYR8Q2EA=="

@@ -10,8 +10,7 @@ import {
   LogOut,
   GraduationCap,
   ShieldAlert,
-  CalendarDays,
-  Zap
+  CalendarDays
 } from 'lucide-react';
 import { User, UserRole } from '../types';
 
@@ -25,7 +24,7 @@ const Sidebar: React.FC<SidebarProps> = ({ user, logout }) => {
     { 
       name: 'Dashboard', 
       icon: LayoutDashboard, 
-      path: '/dashboard', // All users go to /dashboard, App.tsx handles role-based rendering
+      path: '/dashboard?tab=dashboard', // All users go to /dashboard, App.tsx handles role-based rendering
       roles: [UserRole.ADMIN, UserRole.STAFF, UserRole.STUDENT] 
     },
     { 
@@ -37,7 +36,7 @@ const Sidebar: React.FC<SidebarProps> = ({ user, logout }) => {
     { 
       name: 'Faculty Directory', 
       icon: Users, 
-      path: '/dashboard', // Students see Faculty tab in StudentPortal
+      path: '/dashboard?tab=faculty', // Students see Faculty tab in StudentPortal
       roles: [UserRole.STUDENT],
       isStudentTab: true
     },
@@ -71,26 +70,20 @@ const Sidebar: React.FC<SidebarProps> = ({ user, logout }) => {
       path: '/settings', 
       roles: [UserRole.ADMIN] 
     },
-    { 
-      name: 'Test Data Setup', 
-      icon: Zap, 
-      path: '/test-data', 
-      roles: [UserRole.ADMIN] 
-    },
   ];
 
   const filteredItems = menuItems.filter(item => item.roles.includes(user.role));
 
   return (
-    <aside className="w-80 bg-white text-slate-900 flex flex-col h-full border-r border-slate-100 relative z-30 shadow-sm">
+    <aside className="sidebar">
       {/* Sidebar Header */}
-      <div className="p-10 flex items-center gap-5">
-        <div className="bg-indigo-600 p-3 rounded-2xl shadow-xl shadow-indigo-600/20 group cursor-pointer hover:rotate-12 transition-transform duration-500">
+      <div className="sidebar-header">
+        <div className="icon">
           <GraduationCap className="w-8 h-8 text-white" />
         </div>
         <div>
-           <span className="text-3xl font-black tracking-tighter block leading-none text-slate-900">AttendX</span>
-           <span className="text-[9px] font-black text-indigo-600 uppercase tracking-[0.3em] mt-1.5 block opacity-80">Online OS</span>
+           <span className="title">AttendX</span>
+           <span className="subtitle">Online OS</span>
         </div>
       </div>
 
@@ -101,22 +94,14 @@ const Sidebar: React.FC<SidebarProps> = ({ user, logout }) => {
 
           return (
             <NavLink
-              key={item.path}
+              key={`${item.path}-${item.name}`}
               to={item.path}
-              className={({ isActive }) => `
-                flex items-center gap-4 px-6 py-4 rounded-2xl transition-all duration-300 group relative
-                ${isActive 
-                  ? 'bg-indigo-50 text-indigo-600 border border-indigo-100 shadow-sm' 
-                  : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'}
-              `}
+              className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
             >
               {({ isActive }) => (
                 <>
-                  <Icon className={`w-5 h-5 transition-transform duration-500 ${isActive ? 'scale-110 text-indigo-600' : 'group-hover:scale-110 group-hover:text-indigo-600'}`} />
-                  <span className="font-bold text-sm tracking-tight">{item.name}</span>
-                  {isActive && (
-                    <div className="absolute right-4 w-1.5 h-1.5 bg-indigo-600 rounded-full shadow-[0_0_8px_rgba(79,70,229,0.4)]"></div>
-                  )}
+                  <Icon className={`w-5 h-5 ${isActive ? 'text-indigo-600' : ''}`} />
+                  <span>{item.name}</span>
                 </>
               )}
             </NavLink>

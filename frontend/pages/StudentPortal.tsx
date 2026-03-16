@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Calendar, Download, Users, TrendingUp, Clock, FileText, GraduationCap, AlertCircle, MapPin, Play, BookMarked, Phone, Award, Briefcase } from 'lucide-react';
 import { UserRole } from '../types';
 import { getCurrentRole } from '../services/roles';
@@ -93,6 +94,8 @@ const AttendanceDashboard: React.FC<AttendanceDashboardProps> = ({ attendanceDat
 };
 
 const StudentPortal: React.FC = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'dashboard' | 'timetable' | 'faculty' | 'reports'>('dashboard');
   const [reportPeriod, setReportPeriod] = useState<'semester' | 'yearly'>('semester');
   
@@ -106,6 +109,15 @@ const StudentPortal: React.FC = () => {
   // CRITICAL: Verify student role
   const currentRole = getCurrentRole();
   
+  useEffect(() => {
+    // Set initial tab based on URL query parameter (supports sidebar navigation)
+    const params = new URLSearchParams(location.search);
+    const tab = params.get('tab') as 'dashboard' | 'timetable' | 'faculty' | 'reports' | null;
+    if (tab && ['dashboard', 'timetable', 'faculty', 'reports'].includes(tab)) {
+      setActiveTab(tab);
+    }
+  }, [location.search]);
+
   useEffect(() => {
     // Clear any admin-cached data for student view
     if (currentRole === UserRole.STUDENT) {
@@ -295,25 +307,37 @@ const StudentPortal: React.FC = () => {
       {/* Navigation */}
       <div className="flex bg-white p-2 rounded-[2rem] border border-slate-100 shadow-sm overflow-x-auto gap-1">
         <button 
-          onClick={() => setActiveTab('dashboard')}
+          onClick={() => {
+            setActiveTab('dashboard');
+            navigate('/dashboard?tab=dashboard', { replace: true });
+          }}
           className={`px-7 py-3.5 rounded-[1.5rem] text-xs font-black uppercase tracking-[0.15em] transition-all whitespace-nowrap ${activeTab === 'dashboard' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' : 'text-slate-400 hover:text-slate-900 hover:bg-slate-50'}`}
         >
           📊 Dashboard
         </button>
         <button 
-          onClick={() => setActiveTab('timetable')}
+          onClick={() => {
+            setActiveTab('timetable');
+            navigate('/dashboard?tab=timetable', { replace: true });
+          }}
           className={`px-7 py-3.5 rounded-[1.5rem] text-xs font-black uppercase tracking-[0.15em] transition-all whitespace-nowrap ${activeTab === 'timetable' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' : 'text-slate-400 hover:text-slate-900 hover:bg-slate-50'}`}
         >
           📅 My Timetable
         </button>
         <button 
-          onClick={() => setActiveTab('faculty')}
+          onClick={() => {
+            setActiveTab('faculty');
+            navigate('/dashboard?tab=faculty', { replace: true });
+          }}
           className={`px-7 py-3.5 rounded-[1.5rem] text-xs font-black uppercase tracking-[0.15em] transition-all whitespace-nowrap ${activeTab === 'faculty' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' : 'text-slate-400 hover:text-slate-900 hover:bg-slate-50'}`}
         >
           👥 Faculty
         </button>
         <button 
-          onClick={() => setActiveTab('reports')}
+          onClick={() => {
+            setActiveTab('reports');
+            navigate('/dashboard?tab=reports', { replace: true });
+          }}
           className={`px-7 py-3.5 rounded-[1.5rem] text-xs font-black uppercase tracking-[0.15em] transition-all whitespace-nowrap ${activeTab === 'reports' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' : 'text-slate-400 hover:text-slate-900 hover:bg-slate-50'}`}
         >
           📄 Reports
