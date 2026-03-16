@@ -43,6 +43,20 @@ public class DataInitializer {
                 userRepository.save(student);
 
                 createDefaultStudentProfile(studentRepository, student);
+            } else {
+                // FORCE ENABLE ALL DEFAULT ACCOUNTS IF THEY EXIST
+                userRepository.findByUsername("student").ifPresent(u -> {
+                    u.setEnabled(true);
+                    userRepository.save(u);
+                });
+                userRepository.findByUsername("admin").ifPresent(u -> {
+                    u.setEnabled(true);
+                    userRepository.save(u);
+                });
+                userRepository.findByUsername("staff").ifPresent(u -> {
+                    u.setEnabled(true);
+                    userRepository.save(u);
+                });
             }
 
             // If user already exists but no student profile exists, create a basic profile.
