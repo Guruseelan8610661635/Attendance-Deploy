@@ -61,14 +61,8 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // Allow frontend origins
-        configuration.setAllowedOrigins(Arrays.asList(
-            "https://attendence-management-system-dun.vercel.app",
-            "http://localhost:3000",
-            "http://localhost:5173",
-            "http://127.0.0.1:3000",
-            "http://127.0.0.1:5173"
-        ));
+        // Allow frontend origins (including Vercel deployments)
+        configuration.setAllowedOriginPatterns(Arrays.asList("*"));
         // Allow all HTTP methods
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         // Allow all headers
